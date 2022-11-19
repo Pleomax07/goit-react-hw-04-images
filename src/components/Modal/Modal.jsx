@@ -5,12 +5,10 @@ import css from './Modal.module.css';
 class Modal extends Component {
   static propTypes = {
     closeModal: PropTypes.func.isRequired,
-    currentImage: PropTypes.objectOf(
-      PropTypes.shape({
-        largeImageURL: PropTypes.string.isRequired,
-        tags: PropTypes.string.isRequired,
-      })
-    ),
+    currentImage: PropTypes.shape({
+      largeImageURL: PropTypes.string.isRequired,
+      tags: PropTypes.string.isRequired,
+    }),
   };
 
   componentDidMount() {

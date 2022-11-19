@@ -2,12 +2,13 @@ import React, { Component } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import css from '../components/App.module.css';
-import { GetImages } from './servises/Api';
+import { FatchImages } from './servises/Api';
 import Searchbar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import { Loader } from './Loader/Loader';
 import { Button } from './Button/Button';
 import Modal from './Modal/Modal';
+import { Helpers } from './Helpers/Helpers';
 
 class App extends Component {
   state = {
@@ -19,44 +20,32 @@ class App extends Component {
     currentImage: null,
   };
 
-  componentDidUpdate = async (_, prevState) => {
-    const { page, searchNames } = this.state;
-    if (prevState.searchNames !== searchNames) {
-      try {
-        this.setState({ isLoading: true });
-        const images = await GetImages(searchNames, page);
-        const {
-          data: { hits },
-        } = images;
-        this.setState({ images: hits });
-      } catch (error) {
-        this.setState({ error: true });
-        console.log(error.message);
-      } finally {
-        this.setState({ isLoading: false });
-      }
+  componentDidUpdate(_, prevState) {
+    if (
+      prevState.searchNames !== this.state.searchNames ||
+      prevState.page !== this.state.page
+    ) {
+      this.getImages();
     }
+  }
 
-    if (prevState.page !== page && page > 1) {
-      this.setState({ isLoading: true });
-      await GetImages(searchNames, page)
-        .then(res => {
-          const { data } = res;
-          this.setState(prevState => ({
-            images: [...prevState.images, ...data.hits],
-          }));
-        })
-        .catch(error => {
-          this.setState(() => ({
-            error: error,
-          }));
-        })
-        .finally(() => {
-          this.setState({
-            isLoading: false,
-          });
-        });
-    }
+  getImages = () => {
+    this.setState({ isLoading: true });
+
+    const { searchNames, page } = this.state;
+
+    FatchImages(searchNames, page)
+      .then(({ data }) =>
+        this.setState(prevState => ({
+          images: [...prevState.images, ...Helpers(data.hits)],
+        }))
+      )
+      .catch(error => {
+        this.setState(() => ({
+          error: error,
+        }));
+      })
+      .finally(() => this.setState({ isLoading: false }));
   };
 
   handleFormSubmit = searchNames => {
@@ -105,4 +94,3 @@ class App extends Component {
   }
 }
 export default App;
-
