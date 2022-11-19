@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import css from '../components/App.module.css';
@@ -9,88 +9,76 @@ import { Loader } from './Loader/Loader';
 import { Button } from './Button/Button';
 import Modal from './Modal/Modal';
 import { Helpers } from './Helpers/Helpers';
+import { useState, useEffect } from 'react';
 
-class App extends Component {
-  state = {
-    searchNames: '',
-    images: [],
-    page: 1,
-    isLoading: false,
-    error: false,
-    currentImage: null,
-  };
+function App() {
+  const [searchNames, setSearchNames] = useState('');
+  const [images, setImages] = useState([]);
+  const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [currentImage, setCurrentImage] = useState(null);
 
-  componentDidUpdate(_, prevState) {
-    if (
-      prevState.searchNames !== this.state.searchNames ||
-      prevState.page !== this.state.page
-    ) {
-      this.getImages();
+  useEffect(() => {
+    if (searchNames === '') {
+      return;
     }
-  }
+    setIsLoading(true);
+    const getImages = async () => {
+      try {
+        const imgList = await FatchImages(searchNames, page);
+        const {
+          data: { hits },
+        } = imgList;
+        if (page === 1) {
+          setImages(Helpers(hits));
+        } else {
+          setImages(prevState => [...prevState, ...Helpers(hits)]);
+        }
+      } catch (error) {
+        setError(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    getImages();
+  }, [page, searchNames, error]);
 
-  getImages = () => {
-    this.setState({ isLoading: true });
-
-    const { searchNames, page } = this.state;
-
-    FatchImages(searchNames, page)
-      .then(({ data }) =>
-        this.setState(prevState => ({
-          images: [...prevState.images, ...Helpers(data.hits)],
-        }))
-      )
-      .catch(error => {
-        this.setState(() => ({
-          error: error,
-        }));
-      })
-      .finally(() => this.setState({ isLoading: false }));
-  };
-
-  handleFormSubmit = searchNames => {
-    if (searchNames !== this.state.searchNames) {
-      this.setState({ page: 1, images: [] });
+  const handleFormSubmit = enterNames => {
+    if (enterNames !== searchNames) {
+      setPage(1);
+      setImages([]);
     }
-    this.setState({ searchNames });
+    setSearchNames(enterNames);
   };
 
-  onOpenModal = data => {
-    this.setState({
-      currentImage: data,
-    });
+  const onOpenModal = data => {
+    setCurrentImage(data);
   };
 
-  onCloseModal = () => {
-    this.setState({
-      currentImage: null,
-    });
+  const onCloseModal = () => {
+    setCurrentImage(null);
   };
 
-  onloadMore = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
+  const onLoadMore = () => {
+    setPage(prevState => prevState + 1);
   };
 
-  render() {
-    const { isLoading, images, currentImage, error } = this.state;
-
-    return (
-      <section className={css.app}>
-        <Searchbar onSubmit={this.handleFormSubmit} />
-        {images.length > 0 && (
-          <ImageGallery items={images} onClick={this.onOpenModal} />
-        )}
-        {isLoading && <Loader />}
-        {error && <p>Упс! Что-то пошло не так, перезагрузите страницу</p>}
-        {images.length > 0 && <Button loadMore={this.onloadMore} />}
-        {currentImage && (
-          <Modal currentImage={currentImage} closeModal={this.onCloseModal} />
-        )}
-        <ToastContainer autoClose={3000} position="top-center" />
-      </section>
-    );
-  }
+  return (
+    <section className={css.app}>
+      <Searchbar onSubmit={handleFormSubmit} />
+      {images.length > 0 && (
+        <ImageGallery items={images} onClick={onOpenModal} />
+      )}
+      {isLoading && <Loader />}
+      {error && <p>Упс! Что-то пошло не так, перезагрузите страницу</p>}
+      {images.length > 0 && <Button loadMore={onLoadMore} />}
+      {currentImage && (
+        <Modal currentImage={currentImage} closeModal={onCloseModal} />
+      )}
+      <ToastContainer autoClose={3000} position="top-center" />
+    </section>
+  );
 }
+
 export default App;

@@ -18,8 +18,3 @@ export const FatchImages = async (searchNames, page) => {
 };
 
 
-// export const FatchImages = (searchNames, page) => {
-//   return axios(
-//     `${BASE_URL}?q=${searchNames}&page=${page}&key=${KEY}&image_type=photo&orientation=horizontal&per_page=12`
-//   );
-// };

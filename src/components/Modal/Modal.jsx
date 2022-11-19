@@ -1,49 +1,43 @@
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
+import React from 'react';
 import css from './Modal.module.css';
+import { useEffect } from 'react';
 
-class Modal extends Component {
-  static propTypes = {
-    closeModal: PropTypes.func.isRequired,
-    currentImage: PropTypes.shape({
-      largeImageURL: PropTypes.string.isRequired,
-      tags: PropTypes.string.isRequired,
-    }),
-  };
-
-  componentDidMount() {
-    window.addEventListener('keydown', this.onCloseByEscape);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.onCloseByEscape);
-  }
-
-  onCloseByEscape = evt => {
+function Modal({ closeModal, currentImage }) {
+  const onCloseByEscape = evt => {
     if (evt.code === 'Escape') {
-      this.props.closeModal();
+      closeModal();
     }
   };
 
-  onCloseByBackdrop = evt => {
+  const onCloseByBackdrop = evt => {
     if (evt.target === evt.currentTarget) {
-      this.props.closeModal();
+      closeModal();
     }
   };
 
-  render() {
-    const {
-      currentImage: { data },
-    } = this.props;
+  useEffect(() => {
+    window.addEventListener('keydown', onCloseByEscape);
+    return () => {
+      window.removeEventListener('keydown', onCloseByEscape);
+    };
+  }, [onCloseByEscape]);
 
-    return (
-      <div className={css.Overlay} onClick={this.onCloseByBackdrop}>
-        <div className={css.Modal}>
-          <img src={data.largeImageURL} alt={data.tags} width="700px"></img>
-        </div>
+  const { data } = currentImage;
+
+  return (
+    <div className={css.Overlay} onClick={onCloseByBackdrop}>
+      <div className={css.Modal}>
+        <img src={data.largeImageURL} alt={data.tags} width="700px"></img>
       </div>
-    );
-  }
+    </div>
+  );
 }
-
+Modal.propTypes = {
+  closeModal: PropTypes.func.isRequired,
+  currentImage: PropTypes.shape({
+    largeImageURL: PropTypes.string,
+    tags: PropTypes.string,
+  }),
+};
 export default Modal;
