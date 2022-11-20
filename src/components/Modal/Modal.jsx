@@ -4,24 +4,24 @@ import css from './Modal.module.css';
 import { useEffect } from 'react';
 
 function Modal({ closeModal, currentImage }) {
-  const onCloseByEscape = evt => {
-    if (evt.code === 'Escape') {
-      closeModal();
-    }
-  };
+  useEffect(() => {
+    const onCloseByEscape = evt => {
+      if (evt.code === 'Escape') {
+        closeModal();
+      }
+    };
+
+    window.addEventListener('keydown', onCloseByEscape);
+    return () => {
+      window.removeEventListener('keydown', onCloseByEscape);
+    };
+  }, [closeModal]);
 
   const onCloseByBackdrop = evt => {
     if (evt.target === evt.currentTarget) {
       closeModal();
     }
   };
-
-  useEffect(() => {
-    window.addEventListener('keydown', onCloseByEscape);
-    return () => {
-      window.removeEventListener('keydown', onCloseByEscape);
-    };
-  }, [onCloseByEscape]);
 
   const { data } = currentImage;
 
