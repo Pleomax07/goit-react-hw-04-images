@@ -2,7 +2,7 @@ import React from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import css from '../components/App.module.css';
-import { FatchImages } from './servises/Api';
+import { FetchImages } from './servises/Api';
 import Searchbar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import { Loader } from './Loader/Loader';
@@ -26,7 +26,7 @@ function App() {
     setIsLoading(true);
     const getImages = async () => {
       try {
-        const imgList = await FatchImages(searchNames, page);
+        const imgList = await FetchImages(searchNames, page);
         const {
           data: { hits },
         } = imgList;
