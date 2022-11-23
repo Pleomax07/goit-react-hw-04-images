@@ -30,11 +30,8 @@ function App() {
         const {
           data: { hits },
         } = imgList;
-        if (page === 1) {
-          setImages(Helpers(hits));
-        } else {
-          setImages(prevState => [...prevState, ...Helpers(hits)]);
-        }
+       setImages(prevState => [...prevState, ...Helpers(hits)]);
+        
       } catch (error) {
         setError(error);
       } finally {
@@ -45,10 +42,10 @@ function App() {
   }, [page, searchNames, error]);
 
   const handleFormSubmit = enterNames => {
-    if (enterNames !== searchNames) {
+    // if (enterNames !== searchNames) {
       setPage(1);
       setImages([]);
-    }
+    // }
     setSearchNames(enterNames);
   };
 

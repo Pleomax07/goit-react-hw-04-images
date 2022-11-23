@@ -3,7 +3,7 @@ import { ImageGalleryItem } from '../ImageGalleryItem/ImageGalleryItem';
 import css from './ImageGallery.module.css';
 
 const ImageGallery = ({ items, onClick }) => {
-  console.log('ImageGallery', items);
+  // console.log('ImageGallery', items);
   return (
     <ul className={css.ImageGallery}>
       {items.map(item => (
